@@ -10,7 +10,7 @@ export function BarcodeScanner() {
             inputStream: {
                 name: "Live",
                 type: "LiveStream",
-                target: document.querySelector('#videoQuagga'), // Usando la referencia al elemento video
+                target: document.querySelector('#videoQuagga'), // Corregido el id aquí
                 constraints: {
                     width: 640,
                     height: 480,
@@ -27,6 +27,9 @@ export function BarcodeScanner() {
             }
             console.log("Initialization finished. Ready to start");
             Quagga.start();
+            Quagga.onDetected((result) => {
+                console.log('Barcode detected:', result);
+            });
         });
 
         // Limpieza al desmontar el componente
@@ -37,7 +40,7 @@ export function BarcodeScanner() {
 
     return (
         <div>
-            <video id='videQuagga' className='w-[600px] h-[600px] bg-black'></video> {/* Utilizando la referencia al elemento video */}
+            <div id='videoQuagga' className='w-[600px] h-[600px] '></div> {/* Corregido el id aquí */}
         </div>
     );
 };
