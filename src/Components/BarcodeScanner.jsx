@@ -1,8 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Quagga from 'quagga';
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient("https://vmnxetknjsnjczgogdud.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtbnhldGtuanNuamN6Z29nZHVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMDUxMTQyMiwiZXhwIjoyMDI2MDg3NDIyfQ.O5I6b0AcuXaobOVnQai9RQR5sdcimBiXcsr4Tbi4SB8");
+
+
 
 export function BarcodeScanner() {
     const videoRef = useRef(null); // Referencia al elemento video
+    const [barcode, setBarcode] = useState();
+    const [material, setMaterial] = useState();
+
+    const buscarProducto = async (codigo_barra) => {
+        const { data,error } = await supabase.from('productos').select('material').eq('codigo_barra',codigo_barra);
+        if(error){
+            console.log(error);
+        } else{
+            setMaterial(data);
+            console.log(data);
+        }
+        // Simulación de la obtención del material del producto
+        const materialObtenido = "material-1"; // Supongamos que el material del producto es "material-1", "material-2", o "material-3" según lo que hayas obtenido de la base de datos
+    
+    };
+    
 
     useEffect(() => {
         // Inicialización de Quagga
@@ -12,8 +33,8 @@ export function BarcodeScanner() {
                 type: "LiveStream",
                 target: document.querySelector('#videoQuagga'), // Corregido el id aquí
                 constraints: {
-                    width: 640,
-                    height: 480,
+                    width: 1000,
+                    height: 1000,
                     facingMode: "environment"
                 },
             },
@@ -23,12 +44,15 @@ export function BarcodeScanner() {
         }, function (err) {
             if (err) {
                 console.log(err);
-                return
+                return  
             }
             console.log("Initialization finished. Ready to start");
             Quagga.start();
             Quagga.onDetected((result) => {
-                console.log('Barcode detected:', result);
+                setBarcode(result?.codeResult?.code);
+                console.log('buscando');
+                buscarProducto(barcode);
+                // console.log('Material:', buscarProducto(result?.codeResult?.code));
             });
         });
 
@@ -38,9 +62,14 @@ export function BarcodeScanner() {
         };
     }, []);
 
+
+
+
+
     return (
         <div>
-            <div id='videoQuagga' className='w-[600px] h-[600px] '></div> {/* Corregido el id aquí */}
+            <div id='videoQuagga' className='w-[1000px] h-[1000px] '></div> {/* Corregido el id aquí */}
+            <h1>{barcode}</h1>
         </div>
     );
 };

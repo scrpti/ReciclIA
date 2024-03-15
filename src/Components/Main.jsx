@@ -1,5 +1,7 @@
 import { Grip } from 'lucide-react';
-import { BarcodeScanner } from '../logic/BarcodeScanner';
+import { BarcodeScanner } from './BarcodeScanner';
+
+
 
 export function Main() {
 
