@@ -87,8 +87,8 @@ export function BarcodeScanner() {
 
     return (
         <div>
-            <div id='videoQuagga' className='w-[1000px] h-[1000px] '></div> {/* Corregido el id aquí */}
-            <h1>{barcode}</h1>
+            <div id='videoQuagga' className='w-[280px] h-[280px] '></div> {/* Corregido el id aquí */}
+            <h1>{material ? JSON.stringify(material) : 'TODAVIA NO HAY'}</h1>
         </div>
     );
 };
