@@ -11,18 +11,28 @@ export function BarcodeScanner() {
     const videoRef = useRef(null); // Referencia al elemento video
     const [barcode, setBarcode] = useState();
     const [material, setMaterial] = useState();
-    const [diferentesOpciones, setDiferentesOpciones] = useState([]);
+    const codigosLeidos = useRef([]);
 
-    const buscarProducto = async (codigo_barra) => {
-        console.log('lanzo petición');
+    const fetchProduct = async (codigo_barra) => {
         const { data, error } = await supabase.from('productos').select('material').eq('codigo_barra', codigo_barra);
         if (error) {
             console.log(error);
+            return false;
         } else {
             setMaterial(data);
             console.log(codigo_barra, data);
+            return true;
         }
-        const materialObtenido = "material-1"; // Supongamos que el material del producto es "material-1", "material-2", o "material-3" según lo que hayas obtenido de la base de datos
+    }
+
+    const buscarProducto = async () => {
+        const codigosSet = codigosLeidos.current;
+
+        let i = 0;
+        let encontrado = false;
+        while (codigosSet[i] && !encontrado) {
+            encontrado = fetchProduct(codigosSet[i]);
+        };
     };
 
 
@@ -31,7 +41,7 @@ export function BarcodeScanner() {
 
         const buscarProductoConDebounce = debounce((barcode) => {
             buscarProducto(barcode);
-        }, 500);
+        }, 1000);
 
         Quagga.init({
             inputStream: {
@@ -55,9 +65,15 @@ export function BarcodeScanner() {
             console.log("Initialization finished. Ready to start");
             Quagga.start();
             Quagga.onDetected((result) => {
-                setBarcode(result?.codeResult?.code);
-                console.log(result?.codeResult?.code);
-                buscarProductoConDebounce(result?.codeResult?.code);
+                const nuevoCodigo = result?.codeResult?.code;
+                setBarcode(nuevoCodigo);
+                console.log(nuevoCodigo);
+                buscarProductoConDebounce(nuevoCodigo);
+
+                if (nuevoCodigo && !codigosLeidos.current.includes(nuevoCodigo)) {
+                    const anadir = [...codigosLeidos.current, nuevoCodigo];
+                    codigosLeidos.current = anadir;
+                }
             });
         });
 
